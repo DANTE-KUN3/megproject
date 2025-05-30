@@ -1,103 +1,214 @@
-import Image from "next/image";
+'use client';
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import SplitText from 'gsap/SplitText';
+import SplashScreen from './splash/page';
+import { useState } from 'react';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const headingRef = useRef(null);
+  const charsRef = useRef([]);
+  const charIndexRef = useRef(0);
+  const charHRef = useRef(0);
+  const isMouseDownRef = useRef(false);
+  const mouseYRef = useRef({ initial: 0, final: 0 });
+  const [showSplash, setShowSplash] = useState(true);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  useEffect(() => {
+    if (showSplash) return;
+    gsap.registerPlugin(SplitText);
+
+
+    const split = new SplitText(headingRef.current, { type: 'chars' });
+    const chars = split.chars;
+    charsRef.current = chars;
+
+    const weightInit = 600;
+    const weightTarget = 400;
+    const stretchInit = 150;
+    const stretchTarget = 80;
+    const weightDiff = weightInit - weightTarget;
+    const stretchDiff = stretchInit - stretchTarget;
+    const maxYScale = 2.5;
+
+    function calcDispersion(index) {
+      const dispersion = 1 - Math.abs(index - charIndexRef.current) / (chars.length * 0.8);
+      const distY = mouseYRef.current.initial - mouseYRef.current.final;
+      const maxYDrag = charHRef.current * (maxYScale - 1);
+      const dragScale = Math.max(-0.5, Math.min((distY / maxYDrag), maxYScale - 1));
+      return dispersion * dragScale;
+    }
+
+    function snapBack() {
+      gsap.to(chars, {
+        y: 0,
+        fontWeight: weightInit,
+        fontStretch: stretchInit,
+        scaleY: 1,
+        ease: 'elastic(0.35, 0.1)',
+        duration: 1,
+        stagger: {
+          each: 0.02,
+          from: charIndexRef.current
+        }
+      });
+    }
+
+    function onMouseMove(e) {
+      if (!isMouseDownRef.current) return;
+      mouseYRef.current.final = e.clientY;
+
+      gsap.to(chars, {
+        y: (i) => calcDispersion(i) * -50,
+        fontWeight: (i) => weightInit - (calcDispersion(i) * weightDiff),
+        fontStretch: (i) => stretchInit - (calcDispersion(i) * stretchDiff),
+        scaleY: (i) => Math.max(0.5, 1 + calcDispersion(i)),
+        ease: 'power4',
+        duration: 0.6
+      });
+    }
+
+    function onMouseUp() {
+      if (isMouseDownRef.current) {
+        isMouseDownRef.current = false;
+        snapBack();
+        document.body.classList.remove('grab');
+      }
+    }
+
+    function onMouseLeave(e) {
+      if (
+        e.clientY <= 0 || e.clientX <= 0 ||
+        e.clientX >= window.innerWidth || e.clientY >= window.innerHeight
+      ) {
+        snapBack();
+        isMouseDownRef.current = false;
+      }
+    }
+
+    function resize() {
+      charHRef.current = headingRef.current.offsetHeight;
+    }
+
+    // Animate in
+   // After SplitText is applied
+gsap.set(headingRef.current, { opacity: 1 }); // Reveal text container
+gsap.from(chars, {
+  y: -200,
+  fontWeight: weightTarget,
+  fontStretch: stretchTarget,
+  scaleY: 2,
+  ease: "elastic(0.2, 0.1)",
+  duration: 1.5,
+  delay: 0.5,
+  stagger: { each: 0.05, from: 'random' }
+});
+
+
+    // Add mousedown listeners
+    chars.forEach((char, index) => {
+      char.addEventListener('mousedown', (e) => {
+        mouseYRef.current.initial = e.clientY;
+        charIndexRef.current = index;
+        isMouseDownRef.current = true;
+        document.body.classList.add('grab');
+      });
+    });
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('resize', resize);
+    window.addEventListener('mouseleave', onMouseLeave);
+
+    resize();
+
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('mouseleave', onMouseLeave);
+      split.revert();
+    };
+  }, [showSplash]);
+
+  return (
+    <>
+   <SplashScreen onFinish={() => setShowSplash(false)} />
+   <main className="min-h-screen p-10 bg-gray-900 text-black bg-[url(/bg.png)] bg-cover bg-center">
+
+   <h1
+  ref={headingRef}
+  className="text-4xl font-bold mb-10 text-center new opacity-0"
+>
+  Educate Me
+</h1>
+
+
+  
+<div className="flex flex-wrap gap-12 justify-center">
+  {/* Card 1 */}
+<div className="card bg-base-200 w-96 shadow-md border-dashed  ">
+  <figure>
+    <img src="/newcard.jpeg" alt="5–10 years" />
+  </figure>
+  <div className="card-body">
+    <div className="badge badge-accent">5–10 years</div>
+    <p id="p" className="text-black mt-2">
+      Foundational lessons in safety, hygiene, and boundaries for young children.
+    </p>
+    <div className="card-actions mt-4 justify-center flex-wrap gap-2 ">
+      <div className="badge badge-soft badge-primary ">Body Basics</div>
+      <div className="badge badge-soft badge-primary">Good/Bad Touch</div>
+      <div className="badge badge-soft badge-primary">Hygiene</div>
+      <div className="badge badge-soft badge-primary">Consent</div>
+      <div className="badge badge-soft badge-primary">Stories</div>
     </div>
+  </div>
+</div>
+
+
+  {/* Card 2 */}
+  <div className="card bg-base-200 w-96 shadow-md border-dashed ">
+    <figure>
+      <img src="/teen.jpeg" alt="11–15 years" />
+    </figure>
+    <div className="card-body">
+      <div className="badge badge-info">11–15 years</div>
+      <p className="text-black">Interactive education on puberty, identity, relationships, and personal health.</p>
+      <div className="card-actions justify-center flex-wrap gap-2">
+        <div className="badge badge-soft badge-primary">Puberty</div>
+        <div className="badge badge-soft badge-primary">Health</div>
+        <div className="badge badge-soft badge-primary">Consent</div>
+        <div className="badge badge-soft badge-primary">Gender</div>
+        <div className="badge badge-soft badge-primary">Relationships</div>
+      </div>
+    </div>
+  </div>
+
+  {/* Card 3 */}
+  <div className="card bg-base-200 w-96 shadow-md border-dashed ">
+    <figure>
+      <img src="/16.jpg" alt="16+ years" />
+    </figure>
+    <div className="card-body">
+      <div className="badge badge-secondary">16+ years</div>
+      <p className="text-black">Deeper education on adult relationships, rights, health, and social issues.</p><br></br>
+      <div className="card-actions justify-center flex gap-2">
+        <div className="badge badge-soft badge-primary">Contraception</div>
+        <div className="badge badge-soft badge-primary">STIs</div>
+        <div className="badge badge-soft badge-primary">Healthy Relationships</div>
+        <div className="badge badge-soft badge-primary">Consent in Practice</div>
+        <div className="badge badge-soft badge-primary">Pleasure</div>
+        <div className="badge badge-soft badge-primary">Porn Literacy</div>
+        <div className="badge badge-soft badge-primary">Accessing Services</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+</main>
+
+    </>
   );
 }
