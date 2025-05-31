@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import SplitText from 'gsap/SplitText';
 import SplashScreen from './splash/page';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function Home() {
   const headingRef = useRef(null);
@@ -145,9 +146,12 @@ gsap.from(chars, {
 
 
   
-<div className="flex flex-wrap gap-12 justify-center">
+<div className="flex flex-wrap gap-12 justify-center ">
+
+
   {/* Card 1 */}
-<div className="card bg-base-200 w-96 shadow-md border-dashed  ">
+  <Link href="/age/ten" className='block' >
+<div className="card bg-base-200 w-96 shadow-md border-dashed  shadow-blue-900 transition-transform duration-300 ease-in-out hover:shadow-xl hover:scale-105 hover:-translate-y-1 cursor-pointer ">
   <figure>
     <img src="/newcard.jpeg" alt="5–10 years" />
   </figure>
@@ -165,17 +169,19 @@ gsap.from(chars, {
     </div>
   </div>
 </div>
+</Link>
 
 
   {/* Card 2 */}
-  <div className="card bg-base-200 w-96 shadow-md border-dashed ">
+  <Link href="/age/fifteen" className='block' >
+  <div className="card bg-base-200 w-96 shadow-md border-dashed shadow-red-900 transition-transform duration-300 ease-in-out hover:shadow-xl hover:scale-105 hover:-translate-y-1  cursor-pointer">
     <figure>
       <img src="/teen.jpeg" alt="11–15 years" />
     </figure>
     <div className="card-body">
       <div className="badge badge-info">11–15 years</div>
-      <p className="text-black">Interactive education on puberty, identity, relationships, and personal health.</p>
-      <div className="card-actions justify-center flex-wrap gap-2">
+      <p className="text-black mt-2">Interactive education on puberty, identity, relationships, and personal health.</p>
+      <div className="card-actions mt-4 justify-center flex-wrap gap-2 ">
         <div className="badge badge-soft badge-primary">Puberty</div>
         <div className="badge badge-soft badge-primary">Health</div>
         <div className="badge badge-soft badge-primary">Consent</div>
@@ -184,29 +190,32 @@ gsap.from(chars, {
       </div>
     </div>
   </div>
+  </Link>
 
   {/* Card 3 */}
-  <div className="card bg-base-200 w-96 shadow-md border-dashed ">
-    <figure>
-      <img src="/16.jpg" alt="16+ years" />
-    </figure>
-    <div className="card-body">
-      <div className="badge badge-secondary">16+ years</div>
-      <p className="text-black">Deeper education on adult relationships, rights, health, and social issues.</p><br></br>
-      <div className="card-actions justify-center flex gap-2">
-        <div className="badge badge-soft badge-primary">Contraception</div>
-        <div className="badge badge-soft badge-primary">STIs</div>
-        <div className="badge badge-soft badge-primary">Healthy Relationships</div>
-        <div className="badge badge-soft badge-primary">Consent in Practice</div>
-        <div className="badge badge-soft badge-primary">Pleasure</div>
-        <div className="badge badge-soft badge-primary">Porn Literacy</div>
-        <div className="badge badge-soft badge-primary">Accessing Services</div>
-      </div>
+
+  <Link href="/age/adult" className='block' >
+<div className="card bg-base-200 w-96 shadow-md shadow-sky-700 transition-transform duration-300 ease-in-out hover:shadow-xl hover:scale-105 hover:-translate-y-1 cursor-pointer">
+  <figure>
+    <img src="/16.jpg" alt="16+ years" />
+  </figure>
+  <div className="card-body">
+    <div className="badge badge-secondary">16+ years</div>
+    <p className="text-black mt-2">Deeper education on adult relationships, rights, health, and social issues.</p>
+    <div className="card-actions mt-4 justify-center flex-wrap gap-2 ">
+      <div className="badge badge-soft badge-primary">Contraception</div>
+      <div className="badge badge-soft badge-primary">STIs</div>
+      <div className="badge badge-soft badge-primary">Consent in Practice</div>
+      <div className="badge badge-soft badge-primary">Pleasure</div>
+      <div className="badge badge-soft badge-primary">Porn Literacy</div>
     </div>
   </div>
 </div>
+</Link>
 
-  
+</div>
+
+
 </main>
 
     </>

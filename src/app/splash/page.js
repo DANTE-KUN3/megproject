@@ -32,7 +32,7 @@ export default function SplashScreen({ onFinish }) {
           left: 0;
           height: 100vh;
           width: 100vw;
-          background: black url('https://raw.githubusercontent.com/DANTE-KUN3/megproject/refs/heads/master/public/splash.png') center/cover no-repeat;
+          background:url('https://raw.githubusercontent.com/DANTE-KUN3/megproject/refs/heads/master/public/splash.png') center/cover no-repeat;
           z-index: 9999;
           display: flex;
           align-items: center;
